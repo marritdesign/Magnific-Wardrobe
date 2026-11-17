@@ -26,8 +26,8 @@ export function Banners() {
       // Only while you haven't made an outfit yourself yet.
       show: outfits.length === 0,
       palette: LAVENDER,
-      title: 'Mix & match',
-      sub: 'Create your first outfit: put pieces from your own closet together on a moodboard.',
+      title: 'Create your first look',
+      sub: 'Put your pieces together and make it fabulous.',
       cta: 'Get started',
       art: <Image source={stitchShoes} style={st.photoArt} contentFit="cover" contentPosition="left" />,
       go: newOutfit,
