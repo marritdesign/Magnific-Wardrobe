@@ -28,5 +28,5 @@ export const TAB_SPACE = 120
 export const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, "Times New Roman", serif' })
 /** Dusty pink and coral used for the friends banner. */
 export const PINK = { bg: '#E8C7C3', line: '#C4574B', ink: '#5A2620' }
-/** Soft sage used for the mix & match banner. */
-export const SAGE = { bg: '#D5DBC6', line: '#56663F', ink: '#2C3620' }
+/** Soft lavender used for the mix & match banner. */
+export const LAVENDER = { bg: '#D7DAEB', line: '#A9524C', ink: '#111111' }

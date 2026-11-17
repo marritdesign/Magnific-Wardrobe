@@ -9,6 +9,8 @@ interface Data {
   plans: Plans
   wishlist: WishItem[]
   skipped: string[]
+  /** Banners the user closed with the X. */
+  dismissed: string[]
 }
 
 const KEY = 'closet.data.v1'
@@ -17,7 +19,7 @@ function migrate(d: Data): Data {
   const fix = <T extends { category?: string }>(x: T): T => (x.category && LEGACY_CATEGORY[x.category] ? { ...x, category: LEGACY_CATEGORY[x.category] } : x)
   return { ...d, items: d.items.map(fix), wishlist: d.wishlist.map(fix) }
 }
-const empty: Data = { items: [], outfits: [], plans: {}, wishlist: [], skipped: [] }
+const empty: Data = { items: [], outfits: [], plans: {}, wishlist: [], skipped: [], dismissed: [] }
 
 function useStoreValue() {
   const [data, setData] = useState<Data>(empty)
@@ -99,6 +101,9 @@ function useStoreValue() {
       },
       skip(key: string) {
         mut((d) => ({ ...d, skipped: [...d.skipped, key].slice(-500) }))
+      },
+      dismiss(key: string) {
+        mut((d) => ({ ...d, dismissed: [...d.dismissed, key] }))
       },
       clearSkipped() {
         mut((d) => ({ ...d, skipped: [] }))
