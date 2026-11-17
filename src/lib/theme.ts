@@ -1,13 +1,23 @@
+// Calm, image-first palette: warm off-white canvas, near-black ink, quiet greys.
 export const C = {
-  bg: '#F6F1EC',
+  bg: '#F7F5F3',
   card: '#FFFFFF',
-  stage: '#EFE8E1',
-  ink: '#2F2A26',
-  muted: '#8A7F76',
-  line: '#E4DBD2',
-  accent: '#B5654A',
-  accentSoft: '#F3DED4',
-  like: '#3E9B6B',
-  nope: '#C8503F',
+  stage: '#EEEBE7',
+  ink: '#111111',
+  muted: '#8E8A85',
+  faint: '#B9B4AE',
+  line: '#E6E2DD',
+  pill: '#EBE8E4',
+  accent: '#111111',
+  accentSoft: '#E4E0DB',
+  like: '#111111',
+  nope: '#8E8A85',
+  danger: '#B4483A',
 }
-export const R = { sm: 10, md: 16, lg: 24 }
+export const R = { sm: 10, md: 14, lg: 20 }
+export const T = {
+  title: { fontSize: 34, fontWeight: '600' as const, letterSpacing: -1.2, color: C.ink },
+  small: { fontSize: 13, color: C.muted, letterSpacing: -0.1 },
+}
+/** Space kept free at the bottom of scrolling screens for the floating tab bar. */
+export const TAB_SPACE = 120

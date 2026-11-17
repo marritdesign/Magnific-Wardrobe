@@ -4,12 +4,12 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Button, Chip, Empty, s } from '../../components/ui'
+import { Button, Chip, Empty, Title, s } from '../../components/ui'
 import { confirmDelete } from '../../lib/confirm'
 import { persistImage, pickPhoto } from '../../lib/images'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
-import { CATEGORIES, catInfo, type Category, type WishItem } from '../../lib/types'
+import { CATEGORIES, type Category, type WishItem } from '../../lib/types'
 
 type Draft = { name: string; price: string; link: string; notes: string; category?: Category; imageUri?: string }
 const blank: Draft = { name: '', price: '', link: '', notes: '' }
@@ -47,39 +47,50 @@ export default function Wishlist() {
   }
 
   return (
-    <View style={s.screen}>
+    <SafeAreaView edges={['top']} style={s.screen}>
       <ScrollView contentContainerStyle={s.content}>
-        <Button kind="primary" title="＋  Add to wishlist" onPress={() => startEdit('new')} />
+        <Title
+          title="Wishlist"
+          sub={`${open.length} wanted`}
+          right={
+            <Pressable accessibilityLabel="Add to wishlist" onPress={() => startEdit('new')} style={st.add}>
+              <Ionicons name="add" size={26} color="#fff" />
+            </Pressable>
+          }
+        />
         {wishlist.length > 0 && (
           <View style={s.row}>
-            <Chip active={!showBought} onPress={() => setShowBought(false)}>Wanted {open.length}</Chip>
-            <Chip active={showBought} onPress={() => setShowBought(true)}>Bought {bought.length}</Chip>
+            <Chip active={!showBought} onPress={() => setShowBought(false)}>Wanted</Chip>
+            <Chip active={showBought} onPress={() => setShowBought(true)}>Bought</Chip>
           </View>
         )}
-        {wishlist.length === 0 && <Empty emoji="🛍️" title="Your wishlist is empty" text="Save pieces you'd like to buy, with a link and price." />}
+        {wishlist.length === 0 && (
+          <Empty icon="bag-handle-outline" title="Nothing on your wishlist" text="Save pieces you'd like to buy, with a link and price.">
+            <Button kind="primary" title="Add a wish" onPress={() => startEdit('new')} />
+          </Empty>
+        )}
         {list.map((w) => (
-          <Pressable key={w.id} onPress={() => startEdit(w)} style={[s.card, st.row]}>
+          <Pressable key={w.id} onPress={() => startEdit(w)} style={st.row}>
             <View style={st.thumb}>
-              {w.imageUri ? <Image source={{ uri: w.imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : <Text style={{ fontSize: 28 }}>{w.category ? catInfo(w.category).emoji : '🛍️'}</Text>}
+              {w.imageUri ? <Image source={{ uri: w.imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : <Ionicons name="bag-handle-outline" size={24} color={C.faint} />}
             </View>
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={[s.h3, w.bought && { textDecorationLine: 'line-through', color: C.muted }]} numberOfLines={1}>{w.name}</Text>
               {!!w.price && <Text style={s.muted}>{w.price}</Text>}
               {!!w.link && (
                 <Pressable onPress={() => Linking.openURL(/^https?:/.test(w.link!) ? w.link! : `https://${w.link}`)} hitSlop={6}>
-                  <Text style={{ color: C.accent }} numberOfLines={1}>Open shop link ›</Text>
+                  <Text style={{ color: C.ink, textDecorationLine: 'underline', fontSize: 14 }} numberOfLines={1}>View in shop</Text>
                 </Pressable>
               )}
             </View>
             {!w.bought && (
               <Pressable onPress={() => boughtIt(w)} style={st.buy} accessibilityLabel="I bought it">
-                <Ionicons name="checkmark" size={18} color="#fff" />
-                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>Bought</Text>
+                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>Bought it</Text>
               </Pressable>
             )}
           </Pressable>
         ))}
-        {!showBought && open.length > 0 && <Text style={[s.muted, { textAlign: 'center' }]}>Tap “Bought” to photograph it and add it to your closet.</Text>}
+        {!showBought && open.length > 0 && <Text style={[s.muted, { textAlign: 'center' }]}>Tap “Bought it” to photograph it and add it to your closet.</Text>}
       </ScrollView>
 
       <Modal visible={!!editing} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setEditing(null)}>
@@ -96,7 +107,7 @@ export default function Wishlist() {
               <View><Text style={s.label}>What is it?</Text><TextInput style={s.input} value={draft.name} onChangeText={(name) => setDraft({ ...draft, name })} placeholder="e.g. Brown suede boots" placeholderTextColor={C.muted} /></View>
               <View>
                 <Text style={s.label}>Type</Text>
-                <View style={s.wrap}>{CATEGORIES.map((c) => <Chip key={c.id} active={draft.category === c.id} onPress={() => setDraft({ ...draft, category: draft.category === c.id ? undefined : c.id })}>{c.emoji} {c.single}</Chip>)}</View>
+                <View style={s.wrap}>{CATEGORIES.map((c) => <Chip key={c.id} active={draft.category === c.id} onPress={() => setDraft({ ...draft, category: draft.category === c.id ? undefined : c.id })}>{c.single}</Chip>)}</View>
               </View>
               <View><Text style={s.label}>Price</Text><TextInput style={s.input} value={draft.price} onChangeText={(price) => setDraft({ ...draft, price })} placeholder="e.g. €89" placeholderTextColor={C.muted} /></View>
               <View><Text style={s.label}>Shop link</Text><TextInput style={s.input} value={draft.link} autoCapitalize="none" keyboardType="url" onChangeText={(link) => setDraft({ ...draft, link })} placeholder="https://" placeholderTextColor={C.muted} /></View>
@@ -112,13 +123,14 @@ export default function Wishlist() {
           </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const st = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10 },
-  thumb: { width: 64, height: 64, borderRadius: R.sm, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  buy: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: C.like, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 999 },
-  photo: { height: 180, borderRadius: R.md, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  thumb: { width: 76, height: 92, borderRadius: R.md, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  buy: { backgroundColor: C.ink, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
+  photo: { height: 220, borderRadius: R.lg, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  add: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
 })

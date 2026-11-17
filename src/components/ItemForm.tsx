@@ -28,7 +28,7 @@ export function ItemForm({ draft, onChange }: { draft: ItemDraft; onChange: (d: 
       <Field label="Type">
         <View style={s.wrap}>
           {CATEGORIES.map((c) => (
-            <Chip key={c.id} active={draft.category === c.id} onPress={() => set({ category: c.id })}>{c.emoji} {c.single}</Chip>
+            <Chip key={c.id} active={draft.category === c.id} onPress={() => set({ category: c.id })}>{c.single}</Chip>
           ))}
         </View>
       </Field>
@@ -39,7 +39,7 @@ export function ItemForm({ draft, onChange }: { draft: ItemDraft; onChange: (d: 
               key={c.id}
               accessibilityLabel={c.id}
               onPress={() => set({ color: c.id })}
-              style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: c.hex, borderWidth: draft.color === c.id ? 3 : 1, borderColor: draft.color === c.id ? C.accent : C.line }}
+              style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.hex, borderWidth: draft.color === c.id ? 2 : 1, borderColor: draft.color === c.id ? C.ink : 'rgba(0,0,0,0.08)', transform: [{ scale: draft.color === c.id ? 1.12 : 1 }] }}
             />
           ))}
         </View>
@@ -58,8 +58,8 @@ export function ItemForm({ draft, onChange }: { draft: ItemDraft; onChange: (d: 
         <TextInput style={s.input} value={draft.brand ?? ''} placeholder="e.g. COS" placeholderTextColor={C.muted} onChangeText={(brand) => set({ brand })} />
       </Field>
       <View style={[s.row, { justifyContent: 'space-between' }]}>
-        <Text style={[s.h3, { fontSize: 16 }]}>❤️ Favourite</Text>
-        <Switch value={draft.favorite} onValueChange={(favorite) => set({ favorite })} trackColor={{ true: C.accent }} />
+        <Text style={[s.h3, { fontSize: 16 }]}>Favourite</Text>
+        <Switch value={draft.favorite} onValueChange={(favorite) => set({ favorite })} trackColor={{ true: C.ink }} />
       </View>
     </View>
   )

@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Button, OutfitBoard, s } from '../../components/ui'
+import { Button, OutfitBoard, Title, s } from '../../components/ui'
 import { addDays, isoDate, startOfWeek } from '../../lib/dates'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
@@ -24,30 +24,32 @@ export default function Plan() {
   const planned = days.filter((d) => plans[isoDate(d)]).length
 
   return (
-    <View style={s.screen}>
+    <SafeAreaView edges={['top']} style={s.screen}>
       <ScrollView contentContainerStyle={s.content}>
-        <View style={[s.row, { justifyContent: 'space-between' }]}>
-          <Pressable hitSlop={10} accessibilityLabel="Previous week" onPress={() => setWeekStart(addDays(weekStart, -7))}><Ionicons name="chevron-back" size={24} color={C.ink} /></Pressable>
-          <Pressable onPress={() => setWeekStart(startOfWeek(new Date()))} style={{ alignItems: 'center' }}>
-            <Text style={s.h3}>{fmt(weekStart)} – {fmt(end)}</Text>
-            <Text style={s.muted}>{planned}/7 days planned</Text>
-          </Pressable>
-          <Pressable hitSlop={10} accessibilityLabel="Next week" onPress={() => setWeekStart(addDays(weekStart, 7))}><Ionicons name="chevron-forward" size={24} color={C.ink} /></Pressable>
-        </View>
+        <Title
+          title="This week"
+          sub={`${fmt(weekStart)} – ${fmt(end)} · ${planned} of 7 planned`}
+          right={
+            <View style={[s.row, { marginBottom: 4 }]}>
+              <Pressable accessibilityLabel="Previous week" onPress={() => setWeekStart(addDays(weekStart, -7))} style={st.nav}><Ionicons name="chevron-back" size={20} color={C.ink} /></Pressable>
+              <Pressable accessibilityLabel="Next week" onPress={() => setWeekStart(addDays(weekStart, 7))} style={st.nav}><Ionicons name="chevron-forward" size={20} color={C.ink} /></Pressable>
+            </View>
+          }
+        />
         {days.map((d, i) => {
           const key = isoDate(d)
           const oid = plans[key]
           const isToday = key === today
           return (
-            <Pressable key={key} onPress={() => setPicking(key)} style={[st.day, isToday && { borderColor: C.accent, borderWidth: 2 }]}>
+            <Pressable key={key} onPress={() => setPicking(key)} style={st.day}>
               <View style={st.dayLabel}>
-                <Text style={[s.h3, isToday && { color: C.accent }]}>{DAY[i]}</Text>
-                <Text style={s.muted}>{d.getDate()}</Text>
+                <Text style={[st.dayNum, isToday && st.today]}>{d.getDate()}</Text>
+                <Text style={[s.muted, { fontSize: 13 }, isToday && { color: C.ink }]}>{isToday ? 'Today' : DAY[i]}</Text>
               </View>
               {oid ? (
-                <View style={{ flex: 1, height: 120 }}><OutfitBoard compact items={outfitItems(oid)} /></View>
+                <View style={{ flex: 1, height: 130 }}><OutfitBoard compact items={outfitItems(oid)} /></View>
               ) : (
-                <View style={st.emptyDay}><Text style={s.muted}>＋ Plan an outfit</Text></View>
+                <View style={st.emptyDay}><Ionicons name="add" size={18} color={C.muted} /><Text style={s.muted}>Plan an outfit</Text></View>
               )}
             </Pressable>
           )
@@ -76,19 +78,22 @@ export default function Plan() {
               renderItem={({ item: o }) => (
                 <Pressable style={[{ flex: 1 / 2 }, picking && plans[picking] === o.id && { opacity: 0.5 }]} onPress={() => { setPlan(picking!, o.id); setPicking(null) }}>
                   <View style={{ height: 190 }}><OutfitBoard compact items={outfitItems(o.id)} /></View>
-                  <Text numberOfLines={1} style={{ marginTop: 4, color: C.ink }}>{o.name || 'Untitled outfit'}{o.favorite ? ' ❤️' : ''}</Text>
+                  <Text numberOfLines={1} style={{ marginTop: 4, color: C.ink }}>{o.name || 'Untitled outfit'}</Text>
                 </Pressable>
               )}
             />
           )}
         </SafeAreaView>
       </Modal>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const st = StyleSheet.create({
-  day: { flexDirection: 'row', gap: 12, backgroundColor: C.card, borderRadius: R.md, padding: 10, borderWidth: 1, borderColor: C.line, alignItems: 'center' },
-  dayLabel: { width: 44, alignItems: 'center' },
-  emptyDay: { flex: 1, height: 70, borderRadius: R.sm, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  day: { flexDirection: 'row', gap: 14, alignItems: 'center' },
+  dayLabel: { width: 52, alignItems: 'center', gap: 2 },
+  dayNum: { fontSize: 22, fontWeight: '600', letterSpacing: -0.8, color: C.ink, width: 40, height: 40, lineHeight: 40, textAlign: 'center', borderRadius: 20, overflow: 'hidden' },
+  today: { backgroundColor: C.ink, color: '#fff' },
+  emptyDay: { flex: 1, height: 64, borderRadius: R.lg, backgroundColor: C.pill, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center' },
+  nav: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.pill, alignItems: 'center', justifyContent: 'center' },
 })

@@ -24,10 +24,10 @@ export default function OutfitEditor() {
   const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items])
   const chosen = selected.map((x) => byId.get(x)).filter(Boolean) as Item[]
 
-  if (!isNew && !existing) return <Empty emoji="🤷" title="Outfit not found" />
+  if (!isNew && !existing) return <Empty icon="help-outline" title="Outfit not found" />
   if (items.length === 0)
     return (
-      <Empty emoji="👚" title="Add some items first">
+      <Empty icon="shirt-outline" title="Add some items first">
         <Button kind="primary" title="Add item" onPress={() => router.push('/add')} />
       </Empty>
     )
@@ -73,7 +73,7 @@ export default function OutfitEditor() {
           title: isNew ? 'New outfit' : 'Edit outfit',
           headerRight: () => (
             <Pressable hitSlop={10} accessibilityLabel="Favourite" onPress={() => { setFavorite(!favorite); setSaved(false) }}>
-              <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={24} color={favorite ? C.accent : C.ink} />
+              <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={24} color={C.ink} />
             </Pressable>
           ),
         }}
@@ -88,7 +88,7 @@ export default function OutfitEditor() {
         const info = catInfo(cat)
         return (
           <View key={cat} style={{ gap: 8 }}>
-            <Text style={s.h3}>{info.emoji} {info.label}</Text>
+            <Text style={s.label}>{info.label}</Text>
             {pool.length ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                 {pool.map((i) => {
@@ -119,7 +119,7 @@ export default function OutfitEditor() {
 const st = StyleSheet.create({
   preview: { height: 380 },
   hint: { flex: 1, backgroundColor: C.stage, borderRadius: R.md, alignItems: 'center', justifyContent: 'center' },
-  shuffle: { position: 'absolute', right: 10, bottom: 10, width: 46, height: 46, borderRadius: 23, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.line },
-  mini: { width: 84, height: 96, borderRadius: R.sm, backgroundColor: C.card, borderWidth: 2, borderColor: 'transparent', padding: 4 },
-  miniOn: { borderColor: C.accent, backgroundColor: C.accentSoft },
+  shuffle: { position: 'absolute', right: 12, bottom: 12, width: 46, height: 46, borderRadius: 23, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
+  mini: { width: 84, height: 100, borderRadius: R.md, backgroundColor: C.stage, borderWidth: 2, borderColor: 'transparent', padding: 6 },
+  miniOn: { borderColor: C.ink },
 })

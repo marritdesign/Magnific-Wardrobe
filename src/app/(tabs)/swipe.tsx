@@ -3,7 +3,9 @@ import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
-import { Button, Chip, Empty, OutfitBoard, s } from '../../components/ui'
+import { Ionicons } from '@expo/vector-icons'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Button, Chip, Empty, OutfitBoard, Title, s } from '../../components/ui'
 import { currentSeason } from '../../lib/dates'
 import { useStore } from '../../lib/store'
 import { comboKey, suggest } from '../../lib/suggest'
@@ -43,7 +45,7 @@ export default function Swipe() {
     const ids = current.map((i) => i.id)
     if (dir === 1) {
       addOutfit({ name: '', itemIds: ids, favorite: false, source: 'swipe' })
-      setToast('Saved to outfits ❤️')
+      setToast('Saved to outfits')
       setTimeout(() => setToast(undefined), 1300)
     } else skip(comboKey(ids))
     x.value = 0
@@ -93,21 +95,23 @@ export default function Swipe() {
   if (!current) {
     const few = items.length < 3
     return (
-      <View style={[s.screen, { padding: 16 }]}>
+      <SafeAreaView edges={['top']} style={[s.screen, { paddingHorizontal: 16, paddingTop: 8, gap: 16 }]}>
+        <Title title="Discover" sub="Outfits from your own closet" />
         {filters}
         <Empty
-          emoji="🃏"
+          icon="albums-outline"
           title={few ? 'Add a few more items' : 'No new combinations'}
           text={few ? 'Suggestions need at least a top and a bottom (or a dress), and ideally shoes.' : 'Try another season or occasion, or add more items to your closet.'}
         >
           {few ? <Button kind="primary" title="Add item" onPress={() => router.push('/add')} /> : <Button title="Show skipped ones again" onPress={() => { clearSkipped(); setSeed((n) => n + 1) }} />}
         </Empty>
-      </View>
+      </SafeAreaView>
     )
   }
 
   return (
-    <View style={[s.screen, { padding: 16, gap: 14 }]}>
+    <SafeAreaView edges={['top']} style={[s.screen, { paddingHorizontal: 16, paddingTop: 8, gap: 16, paddingBottom: 112 }]}>
+      <Title title="Discover" sub="Outfits from your own closet" />
       {filters}
       <View style={{ flex: 1 }}>
         {next && (
@@ -118,26 +122,25 @@ export default function Swipe() {
         <GestureDetector gesture={pan}>
           <Animated.View key={comboKey(current.map((i) => i.id))} style={[st.card, cardStyle]}>
             <View style={{ flex: 1 }} pointerEvents="none"><OutfitBoard items={current} /></View>
-            <Animated.Text style={[st.stamp, st.like, likeStyle]}>SAVE</Animated.Text>
-            <Animated.Text style={[st.stamp, st.nope, nopeStyle]}>SKIP</Animated.Text>
+            <Animated.Text style={[st.stamp, st.like, likeStyle]}>Save</Animated.Text>
+            <Animated.Text style={[st.stamp, st.nope, nopeStyle]}>Skip</Animated.Text>
           </Animated.View>
         </GestureDetector>
       </View>
-      <View style={[s.row, { justifyContent: 'center', gap: 36 }]}>
-        <Pressable accessibilityLabel="Skip" onPress={() => fly(-1)} style={[st.round, { borderColor: C.nope }]}><Text style={{ fontSize: 26, color: C.nope }}>✕</Text></Pressable>
-        <Pressable accessibilityLabel="Save" onPress={() => fly(1)} style={[st.round, { borderColor: C.like }]}><Text style={{ fontSize: 28, color: C.like }}>♥</Text></Pressable>
+      <View style={[s.row, { justifyContent: 'center', gap: 20 }]}>
+        <Pressable accessibilityLabel="Skip" onPress={() => fly(-1)} style={[st.round, { backgroundColor: C.pill }]}><Ionicons name="close" size={26} color={C.ink} /></Pressable>
+        <Pressable accessibilityLabel="Save" onPress={() => fly(1)} style={[st.round, { backgroundColor: C.ink }]}><Ionicons name="heart" size={24} color="#fff" /></Pressable>
       </View>
-      <Text style={[s.muted, { textAlign: 'center' }]}>Swipe right to save, left to skip</Text>
       {toast && <View style={st.toast}><Text style={{ color: '#fff', fontWeight: '600' }}>{toast}</Text></View>}
-    </View>
+    </SafeAreaView>
   )
 }
 
 const st = StyleSheet.create({
-  card: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: C.card, borderRadius: R.lg, padding: 10, borderWidth: 1, borderColor: C.line, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
-  stamp: { position: 'absolute', top: 24, fontSize: 30, fontWeight: '800', paddingHorizontal: 12, paddingVertical: 4, borderWidth: 4, borderRadius: 10, letterSpacing: 2 },
-  like: { left: 20, color: C.like, borderColor: C.like, transform: [{ rotate: '-12deg' }] },
-  nope: { right: 20, color: C.nope, borderColor: C.nope, transform: [{ rotate: '12deg' }] },
-  round: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
-  toast: { position: 'absolute', bottom: 30, alignSelf: 'center', backgroundColor: C.ink, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999 },
+  card: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: C.stage, borderRadius: R.lg, overflow: 'hidden' },
+  stamp: { position: 'absolute', top: 20, fontSize: 14, fontWeight: '600', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, overflow: 'hidden', letterSpacing: -0.1 },
+  like: { left: 20, color: '#fff', backgroundColor: C.ink },
+  nope: { right: 20, color: C.ink, backgroundColor: '#fff' },
+  round: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
+  toast: { position: 'absolute', top: 70, alignSelf: 'center', backgroundColor: C.ink, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999 },
 })

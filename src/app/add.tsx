@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -68,7 +69,7 @@ export default function AddItem() {
   if (stage === 'pick')
     return (
       <View style={[s.screen, st.center]}>
-        <Text style={{ fontSize: 64 }}>📸</Text>
+        <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: C.pill, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}><Ionicons name="camera-outline" size={36} color={C.ink} /></View>
         <Text style={s.emptyTitle}>Photograph a clothing item</Text>
         <Text style={[s.muted, { textAlign: 'center', marginBottom: 12 }]}>
           Lay it flat or hang it against a plain wall in good light. The app cuts it out so it looks like a product photo.
@@ -81,7 +82,7 @@ export default function AddItem() {
   if (stage === 'working')
     return (
       <View style={[s.screen, st.center]}>
-        <ActivityIndicator size="large" color={C.accent} />
+        <ActivityIndicator size="large" color={C.ink} />
         <Text style={s.h3}>Cleaning up your photo…</Text>
         <Text style={s.muted}>This happens on your phone. Nothing is uploaded.</Text>
       </View>
@@ -115,10 +116,10 @@ export default function AddItem() {
 
 const st = StyleSheet.create({
   center: { alignItems: 'center', justifyContent: 'center', padding: 28, gap: 12 },
-  stage: { aspectRatio: 1, backgroundColor: C.stage, borderRadius: R.lg, overflow: 'hidden' },
+  stage: { aspectRatio: 0.85, backgroundColor: C.stage, borderRadius: R.lg, overflow: 'hidden' },
   note: { backgroundColor: C.accentSoft, color: C.ink, padding: 12, borderRadius: R.sm, fontSize: 14 },
-  seg: { flexDirection: 'row', backgroundColor: C.line, borderRadius: R.sm, padding: 3, alignSelf: 'center' },
-  segBtn: { paddingVertical: 8, paddingHorizontal: 22, borderRadius: 8 },
+  seg: { flexDirection: 'row', backgroundColor: C.pill, borderRadius: 999, padding: 3, alignSelf: 'center' },
+  segBtn: { paddingVertical: 8, paddingHorizontal: 22, borderRadius: 999 },
   segOn: { backgroundColor: C.card },
-  link: { color: C.accent, textAlign: 'center', fontWeight: '600' },
+  link: { color: C.muted, textAlign: 'center', fontWeight: '500', textDecorationLine: 'underline' },
 })
