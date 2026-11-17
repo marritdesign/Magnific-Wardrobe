@@ -96,7 +96,7 @@ export default function Swipe() {
     const few = items.length < 3
     return (
       <SafeAreaView edges={['top']} style={[s.screen, { paddingHorizontal: 16, paddingTop: 8, gap: 16 }]}>
-        <Title title="Discover" sub="Outfits from your own closet" />
+        <Title title="Style me" sub="Swipe through outfits from your own closet" />
         {filters}
         <Empty
           icon="albums-outline"
@@ -111,7 +111,7 @@ export default function Swipe() {
 
   return (
     <SafeAreaView edges={['top']} style={[s.screen, { paddingHorizontal: 16, paddingTop: 8, gap: 16, paddingBottom: 112 }]}>
-      <Title title="Discover" sub="Outfits from your own closet" />
+      <Title title="Style me" sub="Swipe through outfits from your own closet" />
       {filters}
       <View style={{ flex: 1 }}>
         {next && (

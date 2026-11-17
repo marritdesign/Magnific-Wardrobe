@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 // Calm, image-first palette: warm off-white canvas, near-black ink, quiet greys.
 export const C = {
   bg: '#F7F5F3',
@@ -21,3 +23,8 @@ export const T = {
 }
 /** Space kept free at the bottom of scrolling screens for the floating tab bar. */
 export const TAB_SPACE = 120
+
+/** Elegant serif for titles and section headers (system fonts, nothing to download). */
+export const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, "Times New Roman", serif' })
+/** Dusty pink and coral used for the friends banner. */
+export const PINK = { bg: '#E8C7C3', line: '#C4574B', ink: '#5A2620' }

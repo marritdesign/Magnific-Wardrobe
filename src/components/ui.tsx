@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
-import { C, R } from '../lib/theme'
+import { C, R, SERIF } from '../lib/theme'
 import { isBottom, type Item } from '../lib/types'
 
 export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<ViewStyle> }) {
@@ -86,10 +86,32 @@ export function Title({ title, sub, right }: { title: string; sub?: string; righ
   )
 }
 
+/** Serif text tabs with superscript counts and an underline, like "My items⁶⁴ | My outfits⁸". */
+export function TopTabs<K extends string>({ tabs, value, onChange }: { tabs: { key: K; label: string; count?: number }[]; value: K; onChange: (k: K) => void }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 22, marginBottom: 2 }}>
+      {tabs.map((t, i) => {
+        const on = t.key === value
+        return (
+          <View key={t.key} style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 22 }}>
+            {i > 0 && <View style={{ width: 1, height: 22, backgroundColor: C.line, marginBottom: 12 }} />}
+            <Pressable onPress={() => onChange(t.key)} accessibilityRole="tab" accessibilityState={{ selected: on }} hitSlop={8} style={{ paddingBottom: 8, borderBottomWidth: 2, borderBottomColor: on ? C.ink : 'transparent' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text style={{ fontFamily: SERIF, fontSize: 26, letterSpacing: -0.6, color: on ? C.ink : C.faint }}>{t.label}</Text>
+                {t.count !== undefined && <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 3, marginTop: 2, color: on ? C.ink : C.faint }}>{t.count}</Text>}
+              </View>
+            </Pressable>
+          </View>
+        )
+      })}
+    </View>
+  )
+}
+
 export const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
   content: { paddingHorizontal: 16, paddingTop: 8, gap: 16, paddingBottom: 140 },
-  h1: { fontSize: 34, fontWeight: '600', color: C.ink, letterSpacing: -1.2 },
+  h1: { fontSize: 34, fontWeight: '400', color: C.ink, letterSpacing: -0.8, fontFamily: SERIF },
   h3: { fontSize: 15, fontWeight: '600', color: C.ink, letterSpacing: -0.2 },
   muted: { color: C.muted, fontSize: 14, letterSpacing: -0.1 },
   thumb: { backgroundColor: C.stage, borderRadius: R.md, overflow: 'hidden' },

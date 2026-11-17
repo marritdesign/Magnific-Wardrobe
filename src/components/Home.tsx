@@ -1,57 +1,29 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { currentSeason, isoDate } from '../lib/dates'
 import { missingPieces, styleProfile } from '../lib/insights'
 import { useStore } from '../lib/store'
-import { comboKey, suggest } from '../lib/suggest'
-import { C, R } from '../lib/theme'
+import { C, R, SERIF } from '../lib/theme'
 import { catInfo, colorHex, type Item } from '../lib/types'
 import { OutfitBoard, s } from './ui'
 
-/** Today's planned outfit, or a fresh suggestion you can plan with one tap. */
-export function TodayCard() {
-  const { items, outfits, plans, addOutfit, setPlan } = useStore()
-  const [seed, setSeed] = useState(0)
-  const today = isoDate(new Date())
-  const planned = outfits.find((o) => o.id === plans[today])
+/** A thin reminder of today's outfit, shown only when you planned it yourself. */
+export function TodayLine() {
+  const { items, outfits, plans } = useStore()
+  const planned = outfits.find((o) => o.id === plans[isoDate(new Date())])
   const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items])
-  const suggestion = useMemo(
-    () => (planned ? undefined : suggest(items, 1, new Set(), { season: currentSeason() })[0]),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [planned, items, seed],
-  )
-  const shown: Item[] | undefined = planned ? (planned.itemIds.map((id) => byId.get(id)).filter(Boolean) as Item[]) : suggestion
-  if (!shown?.length) return null
-  const date = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
-
-  function wear() {
-    if (!suggestion) return
-    const key = comboKey(suggestion.map((i) => i.id))
-    const existing = outfits.find((o) => comboKey(o.itemIds) === key)
-    setPlan(today, existing?.id ?? addOutfit({ name: '', itemIds: suggestion.map((i) => i.id), favorite: false, source: 'swipe' }))
-  }
-
+  if (!planned) return null
+  const shown = planned.itemIds.map((id) => byId.get(id)).filter(Boolean) as Item[]
   return (
-    <View style={st.today}>
-      <View style={{ width: 118, height: 150 }}><OutfitBoard compact items={shown} /></View>
-      <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 4 }}>
-        <View style={{ gap: 2 }}>
-          <Text style={st.eyebrow}>Today · {date}</Text>
-          <Text style={st.todayTitle}>{planned ? planned.name || 'Your planned outfit' : 'What to wear today'}</Text>
-          <Text style={s.muted}>{planned ? 'Planned for today' : 'A suggestion from your closet'}</Text>
-        </View>
-        {planned ? (
-          <Pressable onPress={() => router.navigate('/plan')} style={st.ghost}><Text style={st.ghostText}>See week</Text></Pressable>
-        ) : (
-          <View style={s.row}>
-            <Pressable onPress={wear} style={st.primary}><Text style={st.primaryText}>Wear this</Text></Pressable>
-            <Pressable onPress={() => setSeed(seed + 1)} style={st.iconBtn} accessibilityLabel="Another suggestion"><Ionicons name="refresh" size={18} color={C.ink} /></Pressable>
-          </View>
-        )}
-      </View>
-    </View>
+    <Pressable onPress={() => router.navigate('/plan')} style={({ pressed }) => [st.todayLine, pressed && { opacity: 0.8 }]}>
+      <View style={{ width: 34, height: 42 }}><OutfitBoard compact items={shown} /></View>
+      <Text style={{ flex: 1, fontSize: 14, color: C.ink }} numberOfLines={1}>
+        <Text style={{ color: C.muted }}>Today · </Text>{planned.name || 'Your planned outfit'}
+      </Text>
+      <Ionicons name="chevron-forward" size={16} color={C.faint} />
+    </Pressable>
   )
 }
 
@@ -92,7 +64,6 @@ export function Explore() {
         )}
       </Section>
 
-      <FriendsPreview />
 
       {items.length > 0 && (
         <Section title="Your style" sub={`${Math.round(profile.neutralShare * 100)}% neutrals · ${profile.favorites} favourite${profile.favorites === 1 ? '' : 's'}`}>
@@ -132,7 +103,7 @@ const FRIENDS = [
   { name: 'Noor', initial: 'N', tone: '#7A5134', pieces: 31, items: [['shirt', '#4F8A55'], ['shirt', '#F0A6C0'], ['footsteps', '#7A5134'], ['bag-handle', '#1D1D1F']] },
 ] as const
 
-function FriendsPreview() {
+export function FriendsPreview() {
   return (
     <View style={{ gap: 12 }}>
       <View style={[s.row, { justifyContent: 'space-between', alignItems: 'flex-start' }]}>
@@ -195,6 +166,7 @@ function Section({ title, sub, children }: { title: string; sub?: string; childr
 }
 
 const st = StyleSheet.create({
+  todayLine: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderRadius: 999, paddingVertical: 6, paddingLeft: 10, paddingRight: 16 },
   today: { flexDirection: 'row', gap: 14, backgroundColor: C.card, borderRadius: R.lg, padding: 10 },
   eyebrow: { fontSize: 12, color: C.muted, fontWeight: '500' },
   todayTitle: { fontSize: 19, fontWeight: '600', letterSpacing: -0.5, color: C.ink },
@@ -203,7 +175,7 @@ const st = StyleSheet.create({
   ghost: { alignSelf: 'flex-start', backgroundColor: C.pill, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 10 },
   ghostText: { color: C.ink, fontWeight: '600', fontSize: 14 },
   iconBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.pill, alignItems: 'center', justifyContent: 'center' },
-  sectionTitle: { fontSize: 22, fontWeight: '600', letterSpacing: -0.6, color: C.ink },
+  sectionTitle: { fontSize: 24, fontFamily: SERIF, letterSpacing: -0.4, color: C.ink },
   gap: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderRadius: R.lg, padding: 10 },
   gapSwatch: { width: 56, height: 56, borderRadius: R.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' },
   wishBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center' },
