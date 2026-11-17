@@ -1,6 +1,6 @@
 import { Link, router } from 'expo-router'
 import { useState } from 'react'
-import { FlatList, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native'
+import { FlatList, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { Button, Chip, Empty, OutfitBoard, Title, s } from '../../components/ui'
@@ -10,15 +10,15 @@ import type { Item } from '../../lib/types'
 
 export default function Outfits() {
   const { outfits, items } = useStore()
-  const { width } = useWindowDimensions()
+  const [width, setWidth] = useState(0)
   const [favOnly, setFavOnly] = useState(false)
   const byId = new Map(items.map((i) => [i.id, i]))
   const list = outfits.filter((o) => !favOnly || o.favorite)
   const cols = width > 600 ? 3 : 2
-  const w = (Math.min(width, 900) - 32 - (cols - 1) * 12) / cols
+  const w = Math.max(0, (width - 32 - (cols - 1) * 12) / cols)
 
   return (
-    <SafeAreaView edges={['top']} style={s.screen}>
+    <SafeAreaView edges={['top']} style={s.screen} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {outfits.length === 0 ? (
         <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
         <Title title="Outfits" />

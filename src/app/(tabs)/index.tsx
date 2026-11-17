@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button, Chip, Empty, Title, s } from '../../components/ui'
 import { useStore } from '../../lib/store'
@@ -15,7 +15,7 @@ const RATIO: Record<string, number> = { dress: 1.4, bottom: 1.3, outerwear: 1.25
 function Masonry({ items, width }: { items: Item[]; width: number }) {
   const cols = width > 700 ? 3 : 2
   const gap = 8
-  const colW = (Math.min(width, 1000) - 32 - gap * (cols - 1)) / cols
+  const colW = (width - gap * (cols - 1)) / cols
   const columns: Item[][] = Array.from({ length: cols }, () => [])
   const heights = new Array(cols).fill(0)
   for (const it of items) {
@@ -41,7 +41,7 @@ function Masonry({ items, width }: { items: Item[]; width: number }) {
 
 export default function Closet() {
   const { items, ready } = useStore()
-  const { width } = useWindowDimensions()
+  const [width, setWidth] = useState(0)
   const [cat, setCat] = useState('all')
   const [favOnly, setFavOnly] = useState(false)
   const [color, setColor] = useState<string>()
@@ -116,7 +116,7 @@ export default function Closet() {
                 </View>
               </View>
             )}
-            {filtered.length === 0 ? <Text style={[s.muted, { textAlign: 'center', padding: 24 }]}>Nothing matches these filters.</Text> : <Masonry items={filtered} width={width} />}
+            {filtered.length === 0 ? <Text style={[s.muted, { textAlign: 'center', padding: 24 }]}>Nothing matches these filters.</Text> : <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>{width > 0 && <Masonry items={filtered} width={width} />}</View>}
           </>
         )}
       </ScrollView>
