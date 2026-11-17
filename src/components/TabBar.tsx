@@ -5,7 +5,7 @@ import { C } from '../lib/theme'
 
 const ICONS: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
   index: ['shirt-outline', 'shirt'],
-  outfits: ['layers-outline', 'layers'],
+  explore: ['compass-outline', 'compass'],
   swipe: ['heart-outline', 'heart'],
   plan: ['calendar-clear-outline', 'calendar-clear'],
   wishlist: ['bag-handle-outline', 'bag-handle'],

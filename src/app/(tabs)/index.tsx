@@ -4,7 +4,8 @@ import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Explore, TodayCard } from '../../components/Home'
+import { TodayCard } from '../../components/Home'
+import { OutfitGrid } from '../../components/OutfitGrid'
 import { Button, Chip, Empty, Title, s } from '../../components/ui'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
@@ -41,7 +42,7 @@ function Masonry({ items, width }: { items: Item[]; width: number }) {
 }
 
 export default function Closet() {
-  const { items, ready } = useStore()
+  const { items, outfits, ready } = useStore()
   const [width, setWidth] = useState(0)
   const [cat, setCat] = useState('all')
   const [favOnly, setFavOnly] = useState(false)
@@ -49,7 +50,7 @@ export default function Closet() {
   const [season, setSeason] = useState<string>()
   const [q, setQ] = useState('')
   const [showFilters, setShowFilters] = useState(false)
-  const [tab, setTab] = useState<'wardrobe' | 'explore'>('wardrobe')
+  const [tab, setTab] = useState<'items' | 'outfits'>('items')
 
   const filtered = useMemo(
     () =>
@@ -73,7 +74,7 @@ export default function Closet() {
         <Title
           title="Closet"
           right={
-            <Pressable accessibilityLabel="Add item" onPress={() => router.push('/add')} style={st.add}>
+            <Pressable accessibilityLabel={tab === 'outfits' ? 'New outfit' : 'Add item'} onPress={() => router.push(tab === 'outfits' ? '/outfit/new' : '/add')} style={st.add}>
               <Ionicons name="add" size={26} color="#fff" />
             </Pressable>
           }
@@ -85,16 +86,16 @@ export default function Closet() {
         ) : (
           <>
             <View style={st.seg}>
-              {(['wardrobe', 'explore'] as const).map((k) => (
+              {(['items', 'outfits'] as const).map((k) => (
                 <Pressable key={k} onPress={() => setTab(k)} style={[st.segBtn, tab === k && st.segOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === k }}>
                   <Text style={[st.segText, tab === k && { color: C.ink }]}>
-                    {k === 'wardrobe' ? 'My wardrobe' : 'Explore'}
-                    {k === 'wardrobe' && <Text style={{ color: C.muted, fontWeight: '500' }}> {items.length}</Text>}
+                    {k === 'items' ? 'My items' : 'My outfits'}
+                    <Text style={{ color: C.muted, fontWeight: '500' }}> {k === 'items' ? items.length : outfits.length}</Text>
                   </Text>
                 </Pressable>
               ))}
             </View>
-            {tab === 'explore' ? <Explore /> : <>
+            {tab === 'outfits' ? <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>{width > 0 && <OutfitGrid width={width} />}</View> : <>
             <TodayCard />
             <View style={s.row}>
               <View style={[st.search]}>
