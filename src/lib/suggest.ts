@@ -1,4 +1,4 @@
-import type { Item } from './types'
+import { isBottom, type Item } from './types'
 
 const NEUTRAL = new Set(['black', 'white', 'grey', 'beige', 'navy', 'brown'])
 
@@ -37,7 +37,7 @@ export function suggest(all: Item[], n: number, exclude: Set<string>, f: Filters
       (!f.occasion || !i.occasions.length || i.occasions.includes(f.occasion)),
   )
   const by = (c: string) => items.filter((i) => i.category === c)
-  const tops = by('top'), bottoms = by('bottom'), dresses = by('dress'), shoes = by('shoes'), outer = by('outerwear'), acc = by('accessory')
+  const tops = by('top'), bottoms = items.filter((i) => isBottom(i.category)), dresses = by('dress'), shoes = by('shoes'), outer = by('jacket'), acc = by('accessory')
   const canSeparates = tops.length > 0 && bottoms.length > 0
   if (!canSeparates && !dresses.length) return []
 

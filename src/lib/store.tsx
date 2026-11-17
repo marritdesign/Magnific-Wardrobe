@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { deleteImage } from './images'
-import { newId, type Item, type Outfit, type Plans, type WishItem } from './types'
+import { LEGACY_CATEGORY, newId, type Item, type Outfit, type Plans, type WishItem } from './types'
 
 interface Data {
   items: Item[]
@@ -12,6 +12,11 @@ interface Data {
 }
 
 const KEY = 'closet.data.v1'
+
+function migrate(d: Data): Data {
+  const fix = <T extends { category?: string }>(x: T): T => (x.category && LEGACY_CATEGORY[x.category] ? { ...x, category: LEGACY_CATEGORY[x.category] } : x)
+  return { ...d, items: d.items.map(fix), wishlist: d.wishlist.map(fix) }
+}
 const empty: Data = { items: [], outfits: [], plans: {}, wishlist: [], skipped: [] }
 
 function useStoreValue() {
@@ -21,7 +26,7 @@ function useStoreValue() {
 
   useEffect(() => {
     AsyncStorage.getItem(KEY)
-      .then((raw) => raw && setData({ ...empty, ...JSON.parse(raw) }))
+      .then((raw) => raw && setData(migrate({ ...empty, ...JSON.parse(raw) })))
       .catch((e) => console.warn('load failed', e))
       .finally(() => setReady(true))
   }, [])

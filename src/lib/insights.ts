@@ -15,14 +15,15 @@ export interface Gap {
 const BASICS: { name: string; category: Category; color: string }[] = [
   { name: 'White sneakers', category: 'shoes', color: 'white' },
   { name: 'Black ankle boots', category: 'shoes', color: 'black' },
-  { name: 'Straight blue jeans', category: 'bottom', color: 'blue' },
-  { name: 'Black trousers', category: 'bottom', color: 'black' },
-  { name: 'Beige chinos', category: 'bottom', color: 'beige' },
+  { name: 'Straight blue jeans', category: 'trousers', color: 'blue' },
+  { name: 'Black trousers', category: 'trousers', color: 'black' },
+  { name: 'Beige chinos', category: 'trousers', color: 'beige' },
+  { name: 'Black midi skirt', category: 'skirt', color: 'black' },
   { name: 'White T-shirt', category: 'top', color: 'white' },
   { name: 'Black knit', category: 'top', color: 'black' },
   { name: 'Grey sweater', category: 'top', color: 'grey' },
-  { name: 'Beige trench coat', category: 'outerwear', color: 'beige' },
-  { name: 'Black blazer', category: 'outerwear', color: 'black' },
+  { name: 'Beige trench coat', category: 'jacket', color: 'beige' },
+  { name: 'Black blazer', category: 'jacket', color: 'black' },
   { name: 'Black leather bag', category: 'accessory', color: 'black' },
   { name: 'Little black dress', category: 'dress', color: 'black' },
 ]
@@ -30,7 +31,7 @@ const BASICS: { name: string; category: Category; color: string }[] = [
 /** Find versatile pieces that are missing, ranked by how many new outfits they would unlock. */
 export function missingPieces(items: Item[], season: string): Gap[] {
   const n = (c: Category) => items.filter((i) => i.category === c).length
-  const tops = n('top'), bottoms = n('bottom'), dresses = n('dress'), shoes = n('shoes'), outer = n('outerwear')
+  const tops = n('top'), bottoms = n('trousers') + n('skirt'), dresses = n('dress'), shoes = n('shoes'), outer = n('jacket')
   const has = (c: Category, color: string) => items.some((i) => i.category === c && i.color === color)
   const cold = season === 'autumn' || season === 'winter'
   const out: Gap[] = []
@@ -44,7 +45,8 @@ export function missingPieces(items: Item[], season: string): Gap[] {
         unlocks = tops * bottoms + dresses
         reason = shoes === 0 ? `You have no shoes yet. These go with all ${unlocks} of your outfit combinations.` : `Goes with ${unlocks} outfit combinations, since ${b.color} works with everything.`
         break
-      case 'bottom':
+      case 'trousers':
+      case 'skirt':
         unlocks = tops
         reason = bottoms < tops / 2 ? `You have ${tops} tops but only ${bottoms} bottom${bottoms === 1 ? '' : 's'}. This pairs with all of them.` : `Pairs with all ${tops} of your tops.`
         break
@@ -52,7 +54,7 @@ export function missingPieces(items: Item[], season: string): Gap[] {
         unlocks = bottoms
         reason = tops < bottoms / 2 ? `You have ${bottoms} bottoms but only ${tops} top${tops === 1 ? '' : 's'}.` : `Pairs with all ${bottoms} of your bottoms.`
         break
-      case 'outerwear':
+      case 'jacket':
         unlocks = (tops * bottoms + dresses) * (cold ? 1.5 : 0.6)
         reason = outer === 0 ? (cold ? `It's ${season} and you have no jacket or coat yet.` : 'You have no jacket or coat yet.') : `Layers over ${tops * bottoms + dresses} of your combinations.`
         break

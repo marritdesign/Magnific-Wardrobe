@@ -6,10 +6,10 @@ import { Button, Empty, ItemThumb, OutfitBoard, s } from '../../components/ui'
 import { confirmDelete } from '../../lib/confirm'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
-import { catInfo, type Category, type Item } from '../../lib/types'
+import { catInfo, isBottom, type Category, type Item } from '../../lib/types'
 
 const SLOTS: { cat: Category; optional?: boolean }[] = [
-  { cat: 'top' }, { cat: 'bottom' }, { cat: 'dress', optional: true }, { cat: 'outerwear', optional: true }, { cat: 'shoes' }, { cat: 'accessory', optional: true },
+  { cat: 'top' }, { cat: 'trousers' }, { cat: 'skirt', optional: true }, { cat: 'dress', optional: true }, { cat: 'jacket', optional: true }, { cat: 'shoes' }, { cat: 'accessory', optional: true },
 ]
 
 export default function OutfitEditor() {
@@ -39,8 +39,9 @@ export default function OutfitEditor() {
       const cat = (x: string) => byId.get(x)?.category ?? ''
       let next = sel
       if (item.category !== 'accessory') next = next.filter((x) => cat(x) !== item.category)
-      if (item.category === 'dress') next = next.filter((x) => cat(x) !== 'top' && cat(x) !== 'bottom')
-      if (item.category === 'top' || item.category === 'bottom') next = next.filter((x) => cat(x) !== 'dress')
+      if (isBottom(item.category)) next = next.filter((x) => !isBottom(cat(x)))
+      if (item.category === 'dress') next = next.filter((x) => cat(x) !== 'top' && !isBottom(cat(x)))
+      if (item.category === 'top' || isBottom(item.category)) next = next.filter((x) => cat(x) !== 'dress')
       return [...next, item.id]
     })
   }
@@ -51,7 +52,8 @@ export default function OutfitEditor() {
       return pool.length ? pool[Math.floor(Math.random() * pool.length)].id : undefined
     }
     const dress = items.some((i) => i.category === 'dress') && Math.random() < 0.3
-    const ids = [...(dress ? [rnd('dress')] : [rnd('top'), rnd('bottom')]), rnd('shoes'), Math.random() < 0.5 ? rnd('outerwear') : undefined]
+    const skirts = items.some((i) => i.category === 'skirt') && Math.random() < 0.35
+    const ids = [...(dress ? [rnd('dress')] : [rnd('top'), skirts ? rnd('skirt') : rnd('trousers') ?? rnd('skirt')]), rnd('shoes'), Math.random() < 0.5 ? rnd('jacket') : undefined]
     setSelected(ids.filter(Boolean) as string[])
     setSaved(false)
   }

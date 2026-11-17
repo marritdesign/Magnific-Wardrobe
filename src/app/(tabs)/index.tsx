@@ -6,13 +6,14 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TodayCard } from '../../components/Home'
 import { OutfitGrid } from '../../components/OutfitGrid'
+import { Rack } from '../../components/Rack'
 import { Button, Chip, Empty, Title, s } from '../../components/ui'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
 import { CATEGORIES, COLORS, SEASONS, catInfo, itemLabel, type Item } from '../../lib/types'
 
 // Taller tiles for long garments, shorter for small things: gives the grid a natural, board-like rhythm.
-const RATIO: Record<string, number> = { dress: 1.4, bottom: 1.3, outerwear: 1.25, top: 1.05, shoes: 0.78, accessory: 0.88 }
+const RATIO: Record<string, number> = { dress: 1.4, trousers: 1.3, skirt: 1.15, jacket: 1.25, top: 1.05, shoes: 0.78, accessory: 0.88 }
 
 function Masonry({ items, width }: { items: Item[]; width: number }) {
   const cols = width > 700 ? 3 : 2
@@ -67,6 +68,7 @@ export default function Closet() {
 
   if (!ready) return <View style={s.screen} />
   const nFilters = (color ? 1 : 0) + (season ? 1 : 0)
+  const searching = !!q || favOnly || nFilters > 0
 
   return (
     <SafeAreaView edges={['top']} style={s.screen}>
@@ -109,14 +111,6 @@ export default function Closet() {
                 <Ionicons name="options-outline" size={19} color={nFilters > 0 ? '#fff' : C.ink} />
               </Pressable>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }} style={{ marginHorizontal: -16 }}>
-              <View style={{ width: 10 }} />
-              <Chip active={cat === 'all'} onPress={() => setCat('all')}>All</Chip>
-              {CATEGORIES.map((c) => (
-                <Chip key={c.id} active={cat === c.id} onPress={() => setCat(c.id)}>{c.label}</Chip>
-              ))}
-              <View style={{ width: 10 }} />
-            </ScrollView>
             {showFilters && (
               <View style={{ gap: 14, paddingVertical: 4 }}>
                 <View style={s.wrap}>
@@ -130,7 +124,24 @@ export default function Closet() {
                 </View>
               </View>
             )}
-            {filtered.length === 0 ? <Text style={[s.muted, { textAlign: 'center', padding: 24 }]}>Nothing matches these filters.</Text> : <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>{width > 0 && <Masonry items={filtered} width={width} />}</View>}
+            {cat !== 'all' && (
+              <Pressable onPress={() => setCat('all')} style={[s.row, { gap: 4 }]} hitSlop={8}>
+                <Ionicons name="chevron-back" size={18} color={C.ink} />
+                <Text style={s.h3}>{catInfo(cat).label}</Text>
+                <Text style={s.muted}> {filtered.length}</Text>
+              </Pressable>
+            )}
+            {cat === 'all' && !searching ? (
+              <View style={{ gap: 26 }}>
+                {CATEGORIES.map((c) => (
+                  <Rack key={c.id} category={c.id} items={filtered.filter((i) => i.category === c.id)} onSeeAll={() => setCat(c.id)} />
+                ))}
+              </View>
+            ) : filtered.length === 0 ? (
+              <Text style={[s.muted, { textAlign: 'center', padding: 24 }]}>Nothing matches these filters.</Text>
+            ) : (
+              <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>{width > 0 && <Masonry items={filtered} width={width} />}</View>
+            )}
             </>}
           </>
         )}

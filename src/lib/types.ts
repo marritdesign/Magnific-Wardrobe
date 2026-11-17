@@ -1,11 +1,18 @@
 export const CATEGORIES = [
   { id: 'top', label: 'Tops', single: 'Top', emoji: '👚' },
-  { id: 'bottom', label: 'Bottoms', single: 'Bottom', emoji: '👖' },
+  { id: 'trousers', label: 'Trousers', single: 'Trousers', emoji: '👖' },
+  { id: 'skirt', label: 'Skirts', single: 'Skirt', emoji: '🩱' },
   { id: 'dress', label: 'Dresses', single: 'Dress', emoji: '👗' },
-  { id: 'outerwear', label: 'Outerwear', single: 'Outerwear', emoji: '🧥' },
+  { id: 'jacket', label: 'Jackets', single: 'Jacket', emoji: '🧥' },
   { id: 'shoes', label: 'Shoes', single: 'Shoes', emoji: '👟' },
   { id: 'accessory', label: 'Accessories', single: 'Accessory', emoji: '👜' },
 ] as const
+
+/** Trousers and skirts both fill the "bottom" spot in an outfit. */
+export const isBottom = (c: string) => c === 'trousers' || c === 'skirt'
+
+/** Categories from older versions of the app, mapped to the current ones. */
+export const LEGACY_CATEGORY: Record<string, Category> = { bottom: 'trousers', outerwear: 'jacket' }
 
 export type Category = (typeof CATEGORIES)[number]['id']
 

@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
 import { C, R } from '../lib/theme'
-import type { Item } from '../lib/types'
+import { isBottom, type Item } from '../lib/types'
 
 export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<ViewStyle> }) {
   return (
@@ -13,11 +13,11 @@ export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<View
   )
 }
 
-/** Flat-lay board: main column (top + bottom, or dress), side column (outerwear, accessories, shoes). */
+/** Flat-lay board: main column (top + trousers/skirt, or dress), side column (jacket, accessories, shoes). */
 export function OutfitBoard({ items, compact = false }: { items: Item[]; compact?: boolean }) {
   const by = (c: string) => items.filter((i) => i.category === c)
-  const dress = by('dress')[0], top = by('top')[0], bottom = by('bottom')[0]
-  const outer = by('outerwear')[0], shoes = by('shoes')[0], acc = by('accessory').slice(0, 2)
+  const dress = by('dress')[0], top = by('top')[0], bottom = items.find((i) => isBottom(i.category))
+  const outer = by('jacket')[0], shoes = by('shoes')[0], acc = by('accessory').slice(0, 2)
   const pad = compact ? 6 : 12
   return (
     <View style={[s.board, { padding: pad, gap: pad }]}>
