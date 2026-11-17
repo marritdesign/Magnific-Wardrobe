@@ -41,13 +41,14 @@ export function Rack({ category, items, onSeeAll }: { category: Category; items:
               </View>
             </Pressable>
           ))}
-          <Pressable onPress={() => router.push({ pathname: '/add', params: { category } })} style={{ width: items.length ? 84 : 200 }} accessibilityLabel={`Add ${info.single.toLowerCase()}`}>
-            {!shelf && <View style={{ height: 22 }} />}
-            <View style={[st.add, { height: items.length ? h : Math.min(h, 120) }]}>
-              <Ionicons name="add" size={22} color={C.muted} />
-              {items.length === 0 && <Text style={[s.muted, { fontSize: 13 }]}>Add your first {info.single.toLowerCase()}</Text>}
+          {items.length === 0 && (
+            <View style={{ width: 220 }}>
+              {!shelf && <View style={{ height: 22 }} />}
+              <View style={[st.add, { height: 90 }]}>
+                <Text style={[s.muted, { fontSize: 13, textAlign: 'center' }]}>No {info.label.toLowerCase()} yet.{'\n'}Tap + below to add one.</Text>
+              </View>
             </View>
-          </Pressable>
+          )}
         </ScrollView>
         {shelf && <View style={st.shelf} />}
       </View>

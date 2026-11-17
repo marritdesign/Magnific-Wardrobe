@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -16,12 +16,21 @@ const blank: Draft = { name: '', price: '', link: '', notes: '' }
 
 export default function Wishlist() {
   const { wishlist, addWish, updateWish, deleteWish } = useStore()
+  const params = useLocalSearchParams<{ new?: string }>()
+  const [handled, setHandled] = useState<string>()
   const [editing, setEditing] = useState<WishItem | 'new' | null>(null)
   const [draft, setDraft] = useState<Draft>(blank)
   const [showBought, setShowBought] = useState(false)
   const open = wishlist.filter((w) => !w.bought)
   const bought = wishlist.filter((w) => w.bought)
   const list = showBought ? bought : open
+
+  // The central + asks for a new wish by navigating here with ?new=<timestamp>
+  if (params.new && params.new !== handled) {
+    setHandled(params.new)
+    setEditing('new')
+    setDraft(blank)
+  }
 
   function startEdit(w: WishItem | 'new') {
     setEditing(w)
@@ -52,11 +61,6 @@ export default function Wishlist() {
         <Title
           title="Wishlist"
           sub={`${open.length} wanted`}
-          right={
-            <Pressable accessibilityLabel="Add to wishlist" onPress={() => startEdit('new')} style={st.add}>
-              <Ionicons name="add" size={26} color="#fff" />
-            </Pressable>
-          }
         />
         {wishlist.length > 0 && (
           <View style={s.row}>
@@ -111,7 +115,7 @@ export default function Wishlist() {
               </View>
               <View><Text style={s.label}>Price</Text><TextInput style={s.input} value={draft.price} onChangeText={(price) => setDraft({ ...draft, price })} placeholder="e.g. €89" placeholderTextColor={C.muted} /></View>
               <View><Text style={s.label}>Shop link</Text><TextInput style={s.input} value={draft.link} autoCapitalize="none" keyboardType="url" onChangeText={(link) => setDraft({ ...draft, link })} placeholder="https://" placeholderTextColor={C.muted} /></View>
-              <View><Text style={s.label}>Notes</Text><TextInput style={[s.input, { minHeight: 70 }]} multiline value={draft.notes} onChangeText={(notes) => setDraft({ ...draft, notes })} placeholder="Size, colour, goes well with…" placeholderTextColor={C.muted} /></View>
+              <View><Text style={s.label}>Notes</Text><TextInput style={[s.input, { minHeight: 70, borderRadius: 20 }]} multiline value={draft.notes} onChangeText={(notes) => setDraft({ ...draft, notes })} placeholder="Size, colour, goes well with…" placeholderTextColor={C.muted} /></View>
               <Button kind="primary" title="Save" disabled={!draft.name.trim()} onPress={save} />
               {editing && editing !== 'new' && (
                 <>
@@ -132,5 +136,4 @@ const st = StyleSheet.create({
   thumb: { width: 76, height: 92, borderRadius: R.md, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
   buy: { backgroundColor: C.ink, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
   photo: { height: 220, borderRadius: R.lg, backgroundColor: C.stage, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  add: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
 })

@@ -75,11 +75,6 @@ export default function Closet() {
       <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
         <Title
           title="Closet"
-          right={
-            <Pressable accessibilityLabel={tab === 'outfits' ? 'New outfit' : 'Add item'} onPress={() => router.push(tab === 'outfits' ? '/outfit/new' : '/add')} style={st.add}>
-              <Ionicons name="add" size={26} color="#fff" />
-            </Pressable>
-          }
         />
         {items.length === 0 ? (
           <Empty icon="shirt-outline" title="Start your closet" text="Photograph something you own. It appears here, cut out and clean.">
@@ -154,7 +149,6 @@ const st = StyleSheet.create({
   tile: { backgroundColor: C.stage, borderRadius: R.md, overflow: 'hidden' },
   tileImg: { position: 'absolute', top: '8%', bottom: '8%', left: '8%', right: '8%' },
   fav: { position: 'absolute', top: 10, right: 10 },
-  add: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   search: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.pill, borderRadius: 999, paddingHorizontal: 16 },
   round: { width: 46, height: 46, borderRadius: 23, backgroundColor: C.pill, alignItems: 'center', justifyContent: 'center' },
   roundOn: { backgroundColor: C.ink },
