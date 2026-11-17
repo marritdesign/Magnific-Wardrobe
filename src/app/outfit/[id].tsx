@@ -4,11 +4,12 @@ import { useMemo, useState } from 'react'
 import { Image } from 'expo-image'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Button, Empty, OutfitBoard, s } from '../../components/ui'
+import { Moodboard, type Layout } from '../../components/Moodboard'
+import { Button, Chip, Empty, s } from '../../components/ui'
 import { confirmDelete } from '../../lib/confirm'
 import { useStore } from '../../lib/store'
 import { C, R, SERIF } from '../../lib/theme'
-import { catInfo, isBottom, itemLabel, type Category, type Item } from '../../lib/types'
+import { OCCASIONS, catInfo, isBottom, itemLabel, type Category, type Item } from '../../lib/types'
 
 const SLOTS: { cat: Category; optional?: boolean }[] = [
   { cat: 'top' }, { cat: 'trousers' }, { cat: 'skirt', optional: true }, { cat: 'dress', optional: true }, { cat: 'jacket', optional: true }, { cat: 'shoes' }, { cat: 'necklace', optional: true }, { cat: 'earrings', optional: true }, { cat: 'belt', optional: true }, { cat: 'accessory', optional: true },
@@ -22,6 +23,9 @@ export default function OutfitEditor() {
   const [selected, setSelected] = useState<string[]>(existing?.itemIds ?? (preItem ? [preItem] : []))
   const [name, setName] = useState(existing?.name ?? '')
   const [favorite, setFavorite] = useState(existing?.favorite ?? false)
+  const [occasion, setOccasion] = useState(existing?.occasion)
+  const [layout, setLayout] = useState<Layout>(existing?.layout ?? {})
+  const [dragging, setDragging] = useState(false)
   const [saved, setSaved] = useState(false)
   const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items])
   const chosen = selected.map((x) => byId.get(x)).filter(Boolean) as Item[]
@@ -57,11 +61,13 @@ export default function OutfitEditor() {
     const skirts = items.some((i) => i.category === 'skirt') && Math.random() < 0.35
     const ids = [...(dress ? [rnd('dress')] : [rnd('top'), skirts ? rnd('skirt') : rnd('trousers') ?? rnd('skirt')]), rnd('shoes'), Math.random() < 0.5 ? rnd('jacket') : undefined]
     setSelected(ids.filter(Boolean) as string[])
+    setLayout({})
     setSaved(false)
   }
 
   function save() {
-    const data = { name: name.trim(), itemIds: selected, favorite }
+    const keep = Object.fromEntries(Object.entries(layout).filter(([k]) => selected.includes(k)))
+    const data = { name: name.trim(), itemIds: selected, favorite, occasion, layout: keep }
     if (existing) updateOutfit(existing.id, data)
     else {
       const newId = addOutfit({ ...data, source: 'builder' })
@@ -82,20 +88,35 @@ export default function OutfitEditor() {
           <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={20} color={C.ink} />
         </Pressable>
       </View>
-      <ScrollView contentContainerStyle={[s.content, { gap: 26 }]} keyboardShouldPersistTaps="handled">
+      <ScrollView scrollEnabled={!dragging} contentContainerStyle={[s.content, { gap: 26 }]} keyboardShouldPersistTaps="handled">
+        <View style={{ gap: 12 }}>
+          <TextInput style={st.nameInput} value={name} onChangeText={(t) => { setName(t); setSaved(false) }} placeholder="Name your look" placeholderTextColor={C.faint} accessibilityLabel="Outfit name" />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+            {OCCASIONS.map((o) => (
+              <Chip key={o} active={occasion === o} onPress={() => { setOccasion(occasion === o ? undefined : o); setSaved(false) }}>{o[0].toUpperCase() + o.slice(1)}</Chip>
+            ))}
+          </ScrollView>
+        </View>
         <View style={st.preview}>
           {chosen.length ? (
-            <OutfitBoard items={chosen} />
+            <Moodboard
+              items={chosen}
+              layout={layout}
+              onDrag={setDragging}
+              onMove={(id, x, y) => { setLayout((l) => ({ ...l, [id]: { x, y } })); setSaved(false) }}
+              onRemove={(it) => pick(it)}
+            />
           ) : (
             <View style={st.hint}>
               <Ionicons name="sparkles-outline" size={22} color={C.muted} />
               <Text style={st.hintTitle}>Your moodboard</Text>
-              <Text style={[s.muted, { textAlign: 'center' }]}>Tap pieces below to put your look together</Text>
+              <Text style={[s.muted, { textAlign: 'center' }]}>Tap pieces below, then drag them around to style your look</Text>
             </View>
           )}
-          <View style={st.tools}>
+        </View>
+        <View style={st.tools}>
             {chosen.length > 0 && (
-              <Pressable style={st.tool} onPress={() => { setSelected([]); setSaved(false) }} accessibilityLabel="Clear">
+              <Pressable style={st.tool} onPress={() => { setSelected([]); setLayout({}); setSaved(false) }} accessibilityLabel="Clear">
                 <Ionicons name="refresh" size={18} color={C.ink} />
               </Pressable>
             )}
@@ -103,7 +124,6 @@ export default function OutfitEditor() {
               <Ionicons name="shuffle" size={20} color={C.ink} />
             </Pressable>
           </View>
-        </View>
 
         {SLOTS.map(({ cat, optional }) => {
           const pool = items.filter((i) => i.category === cat)
@@ -144,10 +164,6 @@ export default function OutfitEditor() {
         })}
 
         <View style={{ gap: 10 }}>
-          <Text style={st.section}>Name your look</Text>
-          <TextInput style={st.input} value={name} onChangeText={(t) => { setName(t); setSaved(false) }} placeholder="e.g. Friday drinks" placeholderTextColor={C.muted} />
-        </View>
-        <View style={{ gap: 10 }}>
           <Pressable onPress={save} disabled={!selected.length} style={({ pressed }) => [st.save, (!selected.length || pressed) && { opacity: selected.length ? 0.85 : 0.35 }]}>
             <Text style={st.saveText}>{saved ? 'Saved ✓' : existing ? 'Save changes' : 'Save outfit'}</Text>
           </Pressable>
@@ -169,7 +185,7 @@ const st = StyleSheet.create({
   preview: { height: 380, backgroundColor: C.card, borderRadius: 24, padding: 8, overflow: 'hidden' },
   hint: { flex: 1, backgroundColor: '#F2F0ED', borderRadius: 18, alignItems: 'center', justifyContent: 'center', gap: 6, padding: 24 },
   hintTitle: { fontFamily: SERIF, fontSize: 24, color: C.ink },
-  tools: { position: 'absolute', right: 18, bottom: 18, flexDirection: 'row', gap: 8 },
+  tools: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: -14 },
   tool: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
   section: { fontFamily: SERIF, fontSize: 24, color: C.ink, letterSpacing: -0.4 },
   countPill: { backgroundColor: C.pill, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
@@ -185,7 +201,7 @@ const st = StyleSheet.create({
   check: { position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 11.5, color: C.ink, paddingHorizontal: 2, paddingBottom: 2 },
   empty: { backgroundColor: C.card, borderRadius: R.md, padding: 16 },
-  input: { backgroundColor: C.card, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 15, fontSize: 16, color: C.ink },
+  nameInput: { fontFamily: SERIF, fontSize: 30, color: C.ink, letterSpacing: -0.5, paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: C.line },
   save: { backgroundColor: '#2B2B2B', borderRadius: 999, paddingVertical: 17, alignItems: 'center' },
   saveText: { color: '#fff', fontSize: 17, fontWeight: '500', letterSpacing: -0.2 },
 })

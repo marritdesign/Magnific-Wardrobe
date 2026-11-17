@@ -3,6 +3,7 @@ import { Image } from 'expo-image'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
 import { C, R, SERIF } from '../lib/theme'
+import { StaticMoodboard, type Layout } from './Moodboard'
 import { isAccessory, isBottom, type Item } from '../lib/types'
 
 export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<ViewStyle> }) {
@@ -14,7 +15,8 @@ export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<View
 }
 
 /** Flat-lay board: main column (top + trousers/skirt, or dress), side column (jacket, accessories, shoes). */
-export function OutfitBoard({ items, compact = false }: { items: Item[]; compact?: boolean }) {
+export function OutfitBoard({ items, compact = false, layout }: { items: Item[]; compact?: boolean; layout?: Layout }) {
+  if (layout && Object.keys(layout).length) return <StaticMoodboard items={items} layout={layout} />
   const by = (c: string) => items.filter((i) => i.category === c)
   const dress = by('dress')[0], top = by('top')[0], bottom = items.find((i) => isBottom(i.category))
   const outer = by('jacket')[0], shoes = by('shoes')[0], acc = items.filter((i) => isAccessory(i.category)).slice(0, 3)

@@ -66,6 +66,10 @@ export interface Outfit {
   favorite: boolean
   source: 'builder' | 'swipe'
   createdAt: number
+  /** e.g. 'work' or 'going out' */
+  occasion?: string
+  /** Where each piece sits on the moodboard: centre x/y as fractions of the canvas. */
+  layout?: Record<string, { x: number; y: number }>
 }
 
 export interface WishItem {

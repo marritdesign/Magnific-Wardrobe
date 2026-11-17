@@ -38,7 +38,7 @@ export function OutfitGrid({ width }: { width: number }) {
           {list.map((o) => (
             <Pressable key={o.id} onPress={() => router.push(`/outfit/${o.id}`)} style={{ width: w }}>
               <View style={{ height: w * 1.25 }}>
-                <OutfitBoard compact items={o.itemIds.map((id) => byId.get(id)).filter(Boolean) as Item[]} />
+                <OutfitBoard compact layout={o.layout} items={o.itemIds.map((id) => byId.get(id)).filter(Boolean) as Item[]} />
               </View>
               <View style={[s.row, { justifyContent: 'space-between', marginTop: 8 }]}>
                 <Text numberOfLines={1} style={{ color: o.name ? C.ink : C.muted, fontSize: 14, fontWeight: '500', letterSpacing: -0.2, flex: 1 }}>{o.name || 'Untitled'}</Text>

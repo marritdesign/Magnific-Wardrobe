@@ -47,7 +47,7 @@ export default function Plan() {
                 <Text style={[s.muted, { fontSize: 13 }, isToday && { color: C.ink }]}>{isToday ? 'Today' : DAY[i]}</Text>
               </View>
               {oid ? (
-                <View style={{ flex: 1, height: 130 }}><OutfitBoard compact items={outfitItems(oid)} /></View>
+                <View style={{ flex: 1, height: 130 }}><OutfitBoard compact layout={outfits.find((o) => o.id === oid)?.layout} items={outfitItems(oid)} /></View>
               ) : (
                 <View style={st.emptyDay}><Ionicons name="add" size={18} color={C.muted} /><Text style={s.muted}>Plan an outfit</Text></View>
               )}
@@ -77,7 +77,7 @@ export default function Plan() {
               contentContainerStyle={{ gap: 12, paddingBottom: 40 }}
               renderItem={({ item: o }) => (
                 <Pressable style={[{ flex: 1 / 2 }, picking && plans[picking] === o.id && { opacity: 0.5 }]} onPress={() => { setPlan(picking!, o.id); setPicking(null) }}>
-                  <View style={{ height: 190 }}><OutfitBoard compact items={outfitItems(o.id)} /></View>
+                  <View style={{ height: 190 }}><OutfitBoard compact layout={o.layout} items={outfitItems(o.id)} /></View>
                   <Text numberOfLines={1} style={{ marginTop: 4, color: C.ink }}>{o.name || 'Untitled outfit'}</Text>
                 </Pressable>
               )}
