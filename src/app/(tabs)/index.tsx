@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Explore, TodayCard } from '../../components/Home'
 import { Button, Chip, Empty, Title, s } from '../../components/ui'
 import { useStore } from '../../lib/store'
 import { C, R } from '../../lib/theme'
@@ -48,6 +49,7 @@ export default function Closet() {
   const [season, setSeason] = useState<string>()
   const [q, setQ] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [tab, setTab] = useState<'wardrobe' | 'explore'>('wardrobe')
 
   const filtered = useMemo(
     () =>
@@ -70,7 +72,6 @@ export default function Closet() {
       <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
         <Title
           title="Closet"
-          sub={`${items.length} ${items.length === 1 ? 'piece' : 'pieces'}`}
           right={
             <Pressable accessibilityLabel="Add item" onPress={() => router.push('/add')} style={st.add}>
               <Ionicons name="add" size={26} color="#fff" />
@@ -83,6 +84,18 @@ export default function Closet() {
           </Empty>
         ) : (
           <>
+            <View style={st.seg}>
+              {(['wardrobe', 'explore'] as const).map((k) => (
+                <Pressable key={k} onPress={() => setTab(k)} style={[st.segBtn, tab === k && st.segOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === k }}>
+                  <Text style={[st.segText, tab === k && { color: C.ink }]}>
+                    {k === 'wardrobe' ? 'My wardrobe' : 'Explore'}
+                    {k === 'wardrobe' && <Text style={{ color: C.muted, fontWeight: '500' }}> {items.length}</Text>}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            {tab === 'explore' ? <Explore /> : <>
+            <TodayCard />
             <View style={s.row}>
               <View style={[st.search]}>
                 <Ionicons name="search" size={18} color={C.muted} />
@@ -117,6 +130,7 @@ export default function Closet() {
               </View>
             )}
             {filtered.length === 0 ? <Text style={[s.muted, { textAlign: 'center', padding: 24 }]}>Nothing matches these filters.</Text> : <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>{width > 0 && <Masonry items={filtered} width={width} />}</View>}
+            </>}
           </>
         )}
       </ScrollView>
@@ -133,5 +147,9 @@ const st = StyleSheet.create({
   round: { width: 46, height: 46, borderRadius: 23, backgroundColor: C.pill, alignItems: 'center', justifyContent: 'center' },
   roundOn: { backgroundColor: C.ink },
   swatch: { width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
+  seg: { flexDirection: 'row', backgroundColor: C.pill, borderRadius: 999, padding: 4 },
+  segBtn: { flex: 1, paddingVertical: 10, borderRadius: 999, alignItems: 'center' },
+  segOn: { backgroundColor: C.card, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  segText: { fontSize: 15, fontWeight: '600', color: C.muted, letterSpacing: -0.2 },
   swatchOn: { borderWidth: 2, borderColor: C.ink, transform: [{ scale: 1.1 }] },
 })
