@@ -14,7 +14,7 @@ import { C, R, SERIF } from '../../lib/theme'
 import { CATEGORIES, COLORS, SEASONS, catInfo, itemLabel, type Item } from '../../lib/types'
 
 // Taller tiles for long garments, shorter for small things: gives the grid a natural, board-like rhythm.
-const RATIO: Record<string, number> = { dress: 1.4, trousers: 1.3, skirt: 1.15, jacket: 1.25, top: 1.05, shoes: 0.78, accessory: 0.88 }
+const RATIO: Record<string, number> = { dress: 1.4, trousers: 1.3, skirt: 1.15, jacket: 1.25, top: 1.05, shoes: 0.78, necklace: 0.85, earrings: 0.75, belt: 0.75, accessory: 0.88 }
 
 function Masonry({ items, width }: { items: Item[]; width: number }) {
   const cols = width > 700 ? 3 : 2

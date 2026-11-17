@@ -1,6 +1,6 @@
-import { isBottom, type Item } from './types'
+import { isAccessory, isBottom, type Item } from './types'
 
-const NEUTRAL = new Set(['black', 'white', 'grey', 'beige', 'navy', 'brown'])
+const NEUTRAL = new Set(['black', 'white', 'grey', 'beige', 'navy', 'brown', 'gold', 'silver'])
 
 export const comboKey = (ids: string[]) => [...ids].sort().join('-')
 
@@ -37,7 +37,7 @@ export function suggest(all: Item[], n: number, exclude: Set<string>, f: Filters
       (!f.occasion || !i.occasions.length || i.occasions.includes(f.occasion)),
   )
   const by = (c: string) => items.filter((i) => i.category === c)
-  const tops = by('top'), bottoms = items.filter((i) => isBottom(i.category)), dresses = by('dress'), shoes = by('shoes'), outer = by('jacket'), acc = by('accessory')
+  const tops = by('top'), bottoms = items.filter((i) => isBottom(i.category)), dresses = by('dress'), shoes = by('shoes'), outer = by('jacket'), acc = items.filter((i) => isAccessory(i.category))
   const canSeparates = tops.length > 0 && bottoms.length > 0
   if (!canSeparates && !dresses.length) return []
 

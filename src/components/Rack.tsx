@@ -7,8 +7,8 @@ import { catInfo, itemLabel, type Category, type Item } from '../lib/types'
 import { s } from './ui'
 
 // Clothes hang from a rail; shoes and accessories stand on a shelf.
-const ON_SHELF = new Set<string>(['shoes', 'accessory'])
-const HEIGHT: Record<string, number> = { top: 150, trousers: 180, skirt: 150, dress: 200, jacket: 180, shoes: 100, accessory: 110 }
+const ON_SHELF = new Set<string>(['shoes', 'necklace', 'earrings', 'belt', 'accessory'])
+const HEIGHT: Record<string, number> = { top: 150, trousers: 180, skirt: 150, dress: 200, jacket: 180, shoes: 100, necklace: 110, earrings: 100, belt: 100, accessory: 110 }
 const W = 132
 
 export function Rack({ category, items, onSeeAll }: { category: Category; items: Item[]; onSeeAll: () => void }) {

@@ -13,7 +13,7 @@ const BANNERS: BannerData[] = [
     key: 'style',
     palette: SAGE,
     title: 'Mix & match',
-    sub: 'Get started with outfit ideas made from your own closet. Swipe to save the ones you love.',
+    sub: 'Get started with outfit ideas from your own closet. Spin the reels and save the ones you love.',
     cta: 'Style me',
     art: (p) => <OutfitArt p={p} />,
     go: () => router.navigate('/swipe'),

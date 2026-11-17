@@ -9,7 +9,7 @@ import { C, R } from '../../lib/theme'
 import { catInfo, isBottom, type Category, type Item } from '../../lib/types'
 
 const SLOTS: { cat: Category; optional?: boolean }[] = [
-  { cat: 'top' }, { cat: 'trousers' }, { cat: 'skirt', optional: true }, { cat: 'dress', optional: true }, { cat: 'jacket', optional: true }, { cat: 'shoes' }, { cat: 'accessory', optional: true },
+  { cat: 'top' }, { cat: 'trousers' }, { cat: 'skirt', optional: true }, { cat: 'dress', optional: true }, { cat: 'jacket', optional: true }, { cat: 'shoes' }, { cat: 'necklace', optional: true }, { cat: 'earrings', optional: true }, { cat: 'belt', optional: true }, { cat: 'accessory', optional: true },
 ]
 
 export default function OutfitEditor() {

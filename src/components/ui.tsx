@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
 import { C, R, SERIF } from '../lib/theme'
-import { isBottom, type Item } from '../lib/types'
+import { isAccessory, isBottom, type Item } from '../lib/types'
 
 export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<ViewStyle> }) {
   return (
@@ -17,7 +17,7 @@ export function ItemThumb({ item, style }: { item?: Item; style?: StyleProp<View
 export function OutfitBoard({ items, compact = false }: { items: Item[]; compact?: boolean }) {
   const by = (c: string) => items.filter((i) => i.category === c)
   const dress = by('dress')[0], top = by('top')[0], bottom = items.find((i) => isBottom(i.category))
-  const outer = by('jacket')[0], shoes = by('shoes')[0], acc = by('accessory').slice(0, 2)
+  const outer = by('jacket')[0], shoes = by('shoes')[0], acc = items.filter((i) => isAccessory(i.category)).slice(0, 3)
   const pad = compact ? 6 : 12
   return (
     <View style={[s.board, { padding: pad, gap: pad }]}>

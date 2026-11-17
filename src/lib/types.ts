@@ -5,11 +5,17 @@ export const CATEGORIES = [
   { id: 'dress', label: 'Dresses', single: 'Dress', emoji: '👗' },
   { id: 'jacket', label: 'Jackets', single: 'Jacket', emoji: '🧥' },
   { id: 'shoes', label: 'Shoes', single: 'Shoes', emoji: '👟' },
-  { id: 'accessory', label: 'Accessories', single: 'Accessory', emoji: '👜' },
+  { id: 'necklace', label: 'Necklaces', single: 'Necklace', emoji: '📿' },
+  { id: 'earrings', label: 'Earrings', single: 'Earrings', emoji: '💎' },
+  { id: 'belt', label: 'Belts', single: 'Belt', emoji: '🪢' },
+  { id: 'accessory', label: 'Bags & more', single: 'Accessory', emoji: '👜' },
 ] as const
 
 /** Trousers and skirts both fill the "bottom" spot in an outfit. */
 export const isBottom = (c: string) => c === 'trousers' || c === 'skirt'
+
+/** Jewellery, belts and bags: the finishing touches of an outfit. */
+export const isAccessory = (c: string) => c === 'necklace' || c === 'earrings' || c === 'belt' || c === 'accessory'
 
 /** Categories from older versions of the app, mapped to the current ones. */
 export const LEGACY_CATEGORY: Record<string, Category> = { bottom: 'trousers', outerwear: 'jacket' }
@@ -30,6 +36,8 @@ export const COLORS = [
   { id: 'blue', hex: '#3d6bc4' },
   { id: 'navy', hex: '#1f2f56' },
   { id: 'purple', hex: '#7d58b5' },
+  { id: 'gold', hex: '#c9a54a' },
+  { id: 'silver', hex: '#c7c9cc' },
   { id: 'multi', hex: '#c9a0dc' },
 ] as const
 

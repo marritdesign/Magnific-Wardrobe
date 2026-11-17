@@ -7,7 +7,7 @@ A digital wardrobe app for iPhone and Android, built with Expo (React Native).
 - **Add items**: photograph a clothing item; the phone cuts out the background (iOS 17+ Vision / Android ML Kit, on-device and free) so it looks like a product photo.
 - **Closet**: grid of everything you own, with labels for type, colour, season, occasion, brand and favourites. Search and filter.
 - **Outfits**: mix-and-match builder (with a 🎲 shuffle), saved outfits, favourites.
-- **Swipe**: Tinder-style outfit suggestions. Right saves the outfit, left skips it. Filter by season and occasion; colour-harmony and favourites guide the picks.
+- **Style me**: a fruit-machine of outfit reels (top or dress, bottom, shoes, plus necklace, earrings and belt). Spin, lock the pieces you like, spin again and save. Filter by season and occasion; colour harmony and favourites guide the picks.
 - **Week plan**: assign an outfit to each day, browse week by week.
 - **Wishlist**: things you want to buy, with photo, price, link and notes. "Bought" takes you straight to adding it to your closet.
 
