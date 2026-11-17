@@ -1,17 +1,24 @@
 {
   "expo": {
-    "name": "closet",
+    "name": "Closet",
     "slug": "closet",
+    "scheme": "closet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.closetapp.closet",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Closet uses the camera to photograph your clothing items.",
+        "NSPhotoLibraryUsageDescription": "Closet lets you pick photos of your clothing items."
+      }
     },
     "android": {
+      "package": "com.closetapp.closet",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F6F1EC",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -19,7 +26,19 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Closet lets you pick photos of your clothing items.",
+          "cameraPermission": "Closet uses the camera to photograph your clothing items."
+        }
+      ]
+    ]
   }
 }
