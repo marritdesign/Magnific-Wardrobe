@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
+import { Image } from 'expo-image'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import { Button, Empty, ItemThumb, OutfitBoard, s } from '../../components/ui'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Button, Empty, OutfitBoard, s } from '../../components/ui'
 import { confirmDelete } from '../../lib/confirm'
 import { useStore } from '../../lib/store'
-import { C, R } from '../../lib/theme'
-import { catInfo, isBottom, type Category, type Item } from '../../lib/types'
+import { C, R, SERIF } from '../../lib/theme'
+import { catInfo, isBottom, itemLabel, type Category, type Item } from '../../lib/types'
 
 const SLOTS: { cat: Category; optional?: boolean }[] = [
   { cat: 'top' }, { cat: 'trousers' }, { cat: 'skirt', optional: true }, { cat: 'dress', optional: true }, { cat: 'jacket', optional: true }, { cat: 'shoes' }, { cat: 'necklace', optional: true }, { cat: 'earrings', optional: true }, { cat: 'belt', optional: true }, { cat: 'accessory', optional: true },
@@ -69,59 +71,121 @@ export default function OutfitEditor() {
   }
 
   return (
-    <ScrollView style={s.screen} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
-      <Stack.Screen
-        options={{
-          title: isNew ? 'New outfit' : 'Edit outfit',
-          headerRight: () => (
-            <Pressable hitSlop={10} accessibilityLabel="Favourite" onPress={() => { setFavorite(!favorite); setSaved(false) }}>
-              <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={24} color={C.ink} />
-            </Pressable>
-          ),
-        }}
-      />
-      <View style={st.preview}>
-        {chosen.length ? <OutfitBoard items={chosen} /> : <View style={st.hint}><Text style={s.muted}>Tap items below to build your look</Text></View>}
-        <Pressable style={st.shuffle} onPress={shuffle} accessibilityLabel="Shuffle"><Text style={{ fontSize: 22 }}>🎲</Text></Pressable>
+    <SafeAreaView edges={['top']} style={s.screen}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={st.header}>
+        <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} style={st.circle} accessibilityLabel="Back" hitSlop={6}>
+          <Ionicons name="chevron-back" size={20} color={C.ink} />
+        </Pressable>
+        <Text style={st.headerTitle}>{isNew ? 'New outfit' : 'Edit outfit'}</Text>
+        <Pressable onPress={() => { setFavorite(!favorite); setSaved(false) }} style={st.circle} accessibilityLabel="Favourite" hitSlop={6}>
+          <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={20} color={C.ink} />
+        </Pressable>
       </View>
-      {SLOTS.map(({ cat, optional }) => {
-        const pool = items.filter((i) => i.category === cat)
-        if (!pool.length && optional) return null
-        const info = catInfo(cat)
-        return (
-          <View key={cat} style={{ gap: 8 }}>
-            <Text style={s.label}>{info.label}</Text>
-            {pool.length ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                {pool.map((i) => {
-                  const on = selected.includes(i.id)
-                  return (
-                    <Pressable key={i.id} onPress={() => pick(i)} style={[st.mini, on && st.miniOn]}>
-                      <ItemThumb item={i} style={{ flex: 1, backgroundColor: 'transparent' }} />
-                    </Pressable>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <Pressable onPress={() => router.push('/add')}><Text style={s.muted}>No {info.label.toLowerCase()} yet. Add one ›</Text></Pressable>
+      <ScrollView contentContainerStyle={[s.content, { gap: 26 }]} keyboardShouldPersistTaps="handled">
+        <View style={st.preview}>
+          {chosen.length ? (
+            <OutfitBoard items={chosen} />
+          ) : (
+            <View style={st.hint}>
+              <Ionicons name="sparkles-outline" size={22} color={C.muted} />
+              <Text style={st.hintTitle}>Your moodboard</Text>
+              <Text style={[s.muted, { textAlign: 'center' }]}>Tap pieces below to put your look together</Text>
+            </View>
+          )}
+          <View style={st.tools}>
+            {chosen.length > 0 && (
+              <Pressable style={st.tool} onPress={() => { setSelected([]); setSaved(false) }} accessibilityLabel="Clear">
+                <Ionicons name="refresh" size={18} color={C.ink} />
+              </Pressable>
             )}
+            <Pressable style={st.tool} onPress={shuffle} accessibilityLabel="Shuffle">
+              <Ionicons name="shuffle" size={20} color={C.ink} />
+            </Pressable>
           </View>
-        )
-      })}
-      <View>
-        <Text style={s.label}>Outfit name</Text>
-        <TextInput style={s.input} value={name} onChangeText={(t) => { setName(t); setSaved(false) }} placeholder="e.g. Friday office" placeholderTextColor={C.muted} />
-      </View>
-      <Button kind="primary" title={saved ? 'Saved ✓' : existing ? 'Save changes' : 'Save outfit'} disabled={!selected.length} onPress={save} />
-      {existing && <Button kind="danger" title="Delete outfit" onPress={() => confirmDelete('Delete this outfit?', 'It will also be removed from your week plan.', () => { router.back(); deleteOutfit(existing.id) })} />}
-    </ScrollView>
+        </View>
+
+        {SLOTS.map(({ cat, optional }) => {
+          const pool = items.filter((i) => i.category === cat)
+          if (!pool.length && optional) return null
+          const info = catInfo(cat)
+          return (
+            <View key={cat} style={{ gap: 10 }}>
+              <View style={s.row}>
+                <Text style={st.section}>{info.label}</Text>
+                <View style={st.countPill}><Text style={st.count}>{pool.length}</Text></View>
+              </View>
+              {pool.length ? (
+                <View>
+                  <View style={st.rail} />
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}>
+                    {pool.map((i) => {
+                      const on = selected.includes(i.id)
+                      return (
+                        <Pressable key={i.id} onPress={() => pick(i)} style={{ width: 104 }} accessibilityLabel={itemLabel(i)} accessibilityState={{ selected: on }}>
+                          <View style={st.hanger}><View style={st.dot} /><View style={st.stem} /></View>
+                          <View style={[st.card, on && st.cardOn]}>
+                            <View style={st.tile}>
+                              <Image source={{ uri: i.imageUri }} style={st.img} contentFit="contain" />
+                              {on && <View style={st.check}><Ionicons name="checkmark" size={13} color="#fff" /></View>}
+                            </View>
+                            <Text style={st.name} numberOfLines={1}>{i.name || info.single}</Text>
+                          </View>
+                        </Pressable>
+                      )
+                    })}
+                  </ScrollView>
+                </View>
+              ) : (
+                <Pressable onPress={() => router.push('/add')} style={st.empty}><Text style={s.muted}>No {info.label.toLowerCase()} yet. Add one ›</Text></Pressable>
+              )}
+            </View>
+          )
+        })}
+
+        <View style={{ gap: 10 }}>
+          <Text style={st.section}>Name your look</Text>
+          <TextInput style={st.input} value={name} onChangeText={(t) => { setName(t); setSaved(false) }} placeholder="e.g. Friday drinks" placeholderTextColor={C.muted} />
+        </View>
+        <View style={{ gap: 10 }}>
+          <Pressable onPress={save} disabled={!selected.length} style={({ pressed }) => [st.save, (!selected.length || pressed) && { opacity: selected.length ? 0.85 : 0.35 }]}>
+            <Text style={st.saveText}>{saved ? 'Saved ✓' : existing ? 'Save changes' : 'Save outfit'}</Text>
+          </Pressable>
+          {existing && (
+            <Pressable onPress={() => confirmDelete('Delete this outfit?', 'It will also be removed from your week plan.', () => { router.back(); deleteOutfit(existing.id) })} style={{ alignSelf: 'center', padding: 10 }}>
+              <Text style={{ color: C.danger, fontSize: 15, fontWeight: '500' }}>Delete outfit</Text>
+            </Pressable>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const st = StyleSheet.create({
-  preview: { height: 380 },
-  hint: { flex: 1, backgroundColor: C.stage, borderRadius: R.md, alignItems: 'center', justifyContent: 'center' },
-  shuffle: { position: 'absolute', right: 12, bottom: 12, width: 46, height: 46, borderRadius: 23, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
-  mini: { width: 84, height: 100, borderRadius: R.md, backgroundColor: C.stage, borderWidth: 2, borderColor: 'transparent', padding: 6 },
-  miniOn: { borderColor: C.ink },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 },
+  headerTitle: { fontFamily: SERIF, fontSize: 24, color: C.ink, letterSpacing: -0.4 },
+  circle: { width: 42, height: 42, borderRadius: 21, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
+  preview: { height: 380, backgroundColor: C.card, borderRadius: 24, padding: 8, overflow: 'hidden' },
+  hint: { flex: 1, backgroundColor: '#F2F0ED', borderRadius: 18, alignItems: 'center', justifyContent: 'center', gap: 6, padding: 24 },
+  hintTitle: { fontFamily: SERIF, fontSize: 24, color: C.ink },
+  tools: { position: 'absolute', right: 18, bottom: 18, flexDirection: 'row', gap: 8 },
+  tool: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
+  section: { fontFamily: SERIF, fontSize: 24, color: C.ink, letterSpacing: -0.4 },
+  countPill: { backgroundColor: C.pill, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  count: { fontSize: 12, fontWeight: '600', color: C.muted },
+  rail: { position: 'absolute', top: 4, left: -16, right: -16, height: 1, backgroundColor: '#CFC9C2' },
+  hanger: { height: 18, alignItems: 'center' },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#B3ACA4', marginTop: 0.5 },
+  stem: { width: 1, height: 10, backgroundColor: '#CFC9C2' },
+  card: { backgroundColor: C.card, borderRadius: R.md, padding: 5, gap: 5, borderWidth: 2, borderColor: 'transparent' },
+  cardOn: { borderColor: C.ink },
+  tile: { height: 104, backgroundColor: '#F2F0ED', borderRadius: R.sm, overflow: 'hidden' },
+  img: { position: 'absolute', top: '8%', bottom: '8%', left: '8%', right: '8%' },
+  check: { position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center' },
+  name: { fontSize: 11.5, color: C.ink, paddingHorizontal: 2, paddingBottom: 2 },
+  empty: { backgroundColor: C.card, borderRadius: R.md, padding: 16 },
+  input: { backgroundColor: C.card, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 15, fontSize: 16, color: C.ink },
+  save: { backgroundColor: '#2B2B2B', borderRadius: 999, paddingVertical: 17, alignItems: 'center' },
+  saveText: { color: '#fff', fontSize: 17, fontWeight: '500', letterSpacing: -0.2 },
 })
