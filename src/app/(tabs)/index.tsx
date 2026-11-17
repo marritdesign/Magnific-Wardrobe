@@ -4,7 +4,7 @@ import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FriendsBanner } from '../../components/FriendsBanner'
+import { Banners } from '../../components/Banners'
 import { TodayLine } from '../../components/Home'
 import { OutfitGrid } from '../../components/OutfitGrid'
 import { Rack } from '../../components/Rack'
@@ -124,7 +124,7 @@ export default function Closet() {
             {cat === 'all' && !searching ? (
               <View style={{ gap: 28 }}>
                 <TodayLine />
-                <FriendsBanner />
+                <Banners />
                 {CATEGORIES.map((c) => (
                   <Rack key={c.id} category={c.id} items={filtered.filter((i) => i.category === c.id)} onSeeAll={() => setCat(c.id)} />
                 ))}
