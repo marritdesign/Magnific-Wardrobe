@@ -10,13 +10,12 @@ const ICONS: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionico
   explore: ['compass-outline', 'compass'],
   swipe: ['heart-outline', 'heart'],
   plan: ['calendar-clear-outline', 'calendar-clear'],
-  wishlist: ['bag-handle-outline', 'bag-handle'],
 }
 
 const ACTIONS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: string; go: () => void }[] = [
   { icon: 'camera-outline', title: 'Add clothing item', sub: 'Take or choose a photo', go: () => router.push('/add') },
   { icon: 'layers-outline', title: 'New outfit', sub: 'Mix and match your items', go: () => router.push('/outfit/new') },
-  { icon: 'bag-add-outline', title: 'Add to wishlist', sub: 'Something you’d like to buy', go: () => router.navigate({ pathname: '/wishlist', params: { new: String(Date.now()) } }) },
+  { icon: 'bag-add-outline', title: 'Add to wishlist', sub: 'Something you’d like to buy', go: () => router.navigate({ pathname: '/explore', params: { wish: String(Date.now()) } }) },
 ]
 
 /** Floating dark pill with icon-only tabs and one central + for adding anything. */

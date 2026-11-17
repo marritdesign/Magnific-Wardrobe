@@ -9,7 +9,6 @@ export default function TabsLayout() {
       <Tabs.Screen name="swipe" options={{ title: 'Discover' }} />
       <Tabs.Screen name="explore" options={{ title: 'Explore' }} />
       <Tabs.Screen name="plan" options={{ title: 'Week plan' }} />
-      <Tabs.Screen name="wishlist" options={{ title: 'Wishlist' }} />
     </Tabs>
   )
 }

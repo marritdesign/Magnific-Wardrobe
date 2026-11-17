@@ -1,22 +1,22 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Button, Chip, Empty, Title, s } from '../../components/ui'
-import { confirmDelete } from '../../lib/confirm'
-import { persistImage, pickPhoto } from '../../lib/images'
-import { useStore } from '../../lib/store'
-import { C, R } from '../../lib/theme'
-import { CATEGORIES, type Category, type WishItem } from '../../lib/types'
+import { Button, Chip, Empty, s } from './ui'
+import { confirmDelete } from '../lib/confirm'
+import { persistImage, pickPhoto } from '../lib/images'
+import { useStore } from '../lib/store'
+import { C, R } from '../lib/theme'
+import { CATEGORIES, type Category, type WishItem } from '../lib/types'
 
 type Draft = { name: string; price: string; link: string; notes: string; category?: Category; imageUri?: string }
 const blank: Draft = { name: '', price: '', link: '', notes: '' }
 
-export default function Wishlist() {
+/** Wishlist content; shown inside Explore. `newRequest` changes when the central + asks for a new wish. */
+export function Wishlist({ newRequest }: { newRequest?: string }) {
   const { wishlist, addWish, updateWish, deleteWish } = useStore()
-  const params = useLocalSearchParams<{ new?: string }>()
   const [handled, setHandled] = useState<string>()
   const [editing, setEditing] = useState<WishItem | 'new' | null>(null)
   const [draft, setDraft] = useState<Draft>(blank)
@@ -26,8 +26,8 @@ export default function Wishlist() {
   const list = showBought ? bought : open
 
   // The central + asks for a new wish by navigating here with ?new=<timestamp>
-  if (params.new && params.new !== handled) {
-    setHandled(params.new)
+  if (newRequest && newRequest !== handled) {
+    setHandled(newRequest)
     setEditing('new')
     setDraft(blank)
   }
@@ -56,12 +56,7 @@ export default function Wishlist() {
   }
 
   return (
-    <SafeAreaView edges={['top']} style={s.screen}>
-      <ScrollView contentContainerStyle={s.content}>
-        <Title
-          title="Wishlist"
-          sub={`${open.length} wanted`}
-        />
+    <View style={{ gap: 16 }}>
         {wishlist.length > 0 && (
           <View style={s.row}>
             <Chip active={!showBought} onPress={() => setShowBought(false)}>Wanted</Chip>
@@ -95,7 +90,6 @@ export default function Wishlist() {
           </Pressable>
         ))}
         {!showBought && open.length > 0 && <Text style={[s.muted, { textAlign: 'center' }]}>Tap “Bought it” to photograph it and add it to your closet.</Text>}
-      </ScrollView>
 
       <Modal visible={!!editing} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setEditing(null)}>
         <SafeAreaView style={s.screen}>
@@ -127,7 +121,7 @@ export default function Wishlist() {
           </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
-    </SafeAreaView>
+    </View>
   )
 }
 
